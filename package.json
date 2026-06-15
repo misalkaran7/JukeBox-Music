@@ -1,0 +1,8 @@
+{
+  "name": "jukebox-cli-workspace",
+  "private": true,
+  "scripts": {
+    "start": "node scripts/start-dev.js",
+    "build": "npm --prefix frontend run build"
+  }
+}

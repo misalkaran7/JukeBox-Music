@@ -1,0 +1,242 @@
+package jukebox_cli;
+
+import java.io.*;
+import java.util.*;
+
+public class JukeBoxApp {
+    private static ArrayList<Song> library = new ArrayList<>();
+    private static ArrayList<Playlist> playlists = new ArrayList<>();
+    private static LinkedList<Song> playQueue = new LinkedList<>();
+    private static AudioPlayer player = new AudioPlayer();
+    private static final String PLAYLIST_FILE = "playlists.txt";
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.println("=== Advanced JukeBox CLI Engine ===");
+        
+        // 1. Scan Local Music Directory
+        library = FolderReader.loadSongsFromFolder("music");
+        if (library.isEmpty()) {
+            System.out.println("⚠️ Warning: 'music' folder is empty. Drop .wav files in it to test playback features.");
+        }
+
+        // 2. Load Saved Playlists from File System
+        loadPlaylistsFromFile();
+
+        String mainChoice = "";
+        while (!mainChoice.equals("7")) {
+            System.out.println("\n============================= MAIN MENU =============================");
+            System.out.println("1. View Track Library       2. Manage Playlists      3. View/Clear Queue");
+            System.out.println("4. Add Track to Queue       5. Shuffle & Play Queue  6. Audio Playback Controls");
+            System.out.println("7. Exit Application");
+            System.out.print("Choose an option: ");
+            mainChoice = scanner.nextLine().trim();
+
+            switch (mainChoice) {
+                case "1":
+                    displayLibrary();
+                    break;
+                case "2":
+                    handlePlaylistMenu(scanner);
+                    break;
+                case "3":
+                    displayQueue();
+                    break;
+                case "4":
+                    addTrackToQueueMenu(scanner);
+                    break;
+                case "5":
+                    shuffleAndPlayQueue();
+                    break;
+                case "6":
+                    handlePlaybackMenu(scanner);
+                    break;
+                case "7":
+                    player.stop();
+                    savePlaylistsToFile();
+                    System.out.println("💾 Playlists saved. 👋 Exiting JukeBox Engine. Goodbye!");
+                    break;
+                default:
+                    System.out.println("❌ Invalid option. Try again.");
+            }
+        }
+        scanner.close();
+    }
+
+    private static void displayLibrary() {
+        System.out.println("\n--- Local Music Library ---");
+        if (library.isEmpty()) {
+            System.out.println("No tracks available.");
+            return;
+        }
+        for (int i = 0; i < library.size(); i++) {
+            System.out.println("[" + i + "] " + library.get(i).getTitle());
+        }
+    }
+
+    private static void displayQueue() {
+        System.out.println("\n--- Current Play Queue ---");
+        if (playQueue.isEmpty()) {
+            System.out.println("(Queue is currently empty)");
+            return;
+        }
+        for (int i = 0; i < playQueue.size(); i++) {
+            System.out.println((i == 0 ? "▶️ [Next Up] " : "⏳ [" + i + "] ") + playQueue.get(i).getTitle());
+        }
+    }
+
+    private static void addTrackToQueueMenu(Scanner scanner) {
+        displayLibrary();
+        if (library.isEmpty()) return;
+        
+        System.out.print("\nEnter track number to add to queue: ");
+        try {
+            int idx = Integer.parseInt(scanner.nextLine());
+            if (idx >= 0 && idx < library.size()) {
+                playQueue.add(library.get(idx));
+                System.out.println("➕ Added to queue: " + library.get(idx).getTitle());
+            } else {
+                System.out.println("❌ Track not found.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("❌ Please enter a valid number.");
+        }
+    }
+
+    private static void shuffleAndPlayQueue() {
+        if (playQueue.isEmpty()) {
+            System.out.println("⚠️ The queue is empty! Add tracks before attempting to play.");
+            return;
+        }
+        Collections.shuffle(playQueue);
+        System.out.println("🔀 Queue shuffled successfully!");
+        // Play the front of the queue
+        player.play(playQueue.peek());
+    }
+
+    private static void handlePlaylistMenu(Scanner scanner) {
+        System.out.println("\n--- Playlist Management ---");
+        System.out.println("1. Create New Playlist\n2. View Existing Playlists\n3. Add Track to a Playlist");
+        System.out.print("Selection: ");
+        String choice = scanner.nextLine().trim();
+
+        if (choice.equals("1")) {
+            System.out.print("Enter Playlist Name: ");
+            String name = scanner.nextLine().trim();
+            playlists.add(new Playlist(name));
+            System.out.println("🎉 Playlist '" + name + "' initialized.");
+        } 
+        else if (choice.equals("2")) {
+            if (playlists.isEmpty()) {
+                System.out.println("No playlists recorded yet.");
+                return;
+            }
+            for (int i = 0; i < playlists.size(); i++) {
+                playlists.get(i).displayPlaylist();
+            }
+        } 
+        else if (choice.equals("3")) {
+            if (playlists.isEmpty()) {
+                System.out.println("❌ Create a playlist first!");
+                return;
+            }
+            System.out.println("\nSelect a Playlist:");
+            for (int i = 0; i < playlists.size(); i++) {
+                System.out.println("[" + i + "] " + playlists.get(i).getName());
+            }
+            int pIdx = Integer.parseInt(scanner.nextLine());
+            
+            displayLibrary();
+            System.out.print("Select track index to add: ");
+            int sIdx = Integer.parseInt(scanner.nextLine());
+            
+            if (pIdx >= 0 && pIdx < playlists.size() && sIdx >= 0 && sIdx < library.size()) {
+                playlists.get(pIdx).addSong(library.get(sIdx));
+            } else {
+                System.out.println("❌ Invalid processing parameters.");
+            }
+        }
+    }
+
+    private static void handlePlaybackMenu(Scanner scanner) {
+        String choice = "";
+        while (!choice.equals("back")) {
+            System.out.println("\n--- Live Player Controls ---");
+            System.out.println("Current Audio State: " + player.getStatus().toUpperCase());
+            System.out.println("[play] | [pause] | [resume] | [next] | [stop] | [back]");
+            System.out.print("Action Command: ");
+            choice = scanner.nextLine().toLowerCase().trim();
+
+            switch (choice) {
+                case "play":
+                    if (!playQueue.isEmpty()) player.play(playQueue.peek());
+                    else System.out.println("⚠️ Queue is empty.");
+                    break;
+                case "pause":
+                    player.pause();
+                    break;
+                case "resume":
+                    player.resume();
+                    break;
+                case "next":
+                    player.stop();
+                    if (!playQueue.isEmpty()) {
+                        playQueue.poll(); // Remove old track
+                        if (!playQueue.isEmpty()) {
+                            player.play(playQueue.peek());
+                        } else {
+                            System.out.println("🏁 Reached the end of the play queue.");
+                        }
+                    } else {
+                        System.out.println("⚠️ No more tracks remaining in the active queue.");
+                    }
+                    break;
+                case "stop":
+                    player.stop();
+                    System.out.println("⏹️ Playback stopped.");
+                    break;
+            }
+        }
+    }
+
+    // --- FILE I/O PERSISTENCE LAYER ---
+    private static void savePlaylistsToFile() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(PLAYLIST_FILE))) {
+            for (Playlist p : playlists) {
+                writer.write("PLAYLIST:" + p.getName());
+                writer.newLine();
+                for (Song s : p.getSongs()) {
+                    writer.write(s.getTitle() + "," + s.getFilePath());
+                    writer.newLine();
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("❌ Fatal Error: Could not execute save state routines.");
+        }
+    }
+
+    private static void loadPlaylistsFromFile() {
+        File file = new File(PLAYLIST_FILE);
+        if (!file.exists()) return;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            Playlist currentPlaylist = null;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("PLAYLIST:")) {
+                    String pName = line.substring(9);
+                    currentPlaylist = new Playlist(pName);
+                    playlists.add(currentPlaylist);
+                } else if (currentPlaylist != null && line.contains(",")) {
+                    String[] data = line.split(",");
+                    if (data.length == 2) {
+                        currentPlaylist.addSong(new Song(data[0], data[1]));
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("⚠️ Note: Problem parsing previous playlist database files.");
+        }
+    }
+}

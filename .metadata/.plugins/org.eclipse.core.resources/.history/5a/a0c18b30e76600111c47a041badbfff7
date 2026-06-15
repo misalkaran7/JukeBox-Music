@@ -1,0 +1,71 @@
+package jukebox_cli;
+
+import javax.sound.sampled.*;
+import java.io.File;
+import java.io.IOException;
+
+public class AudioPlayer {
+    private Clip clip;
+    private long currentFrame;
+    private String status; 
+    private Song currentSong;
+
+    public AudioPlayer() {
+        status = "stopped";
+    }
+
+    public void play(Song song) {
+        stop(); 
+        currentSong = song;
+        
+        try {
+            File audioFile = new File(song.getFilePath());
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(audioFile.getAbsoluteFile());
+            
+            clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.start(); 
+            
+            status = "play";
+            System.out.println("🎶 Now playing: " + song.getTitle());
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            System.out.println("❌ Error playing audio file: " + e.getMessage());
+        }
+    }
+
+    public void pause() {
+        if (status.equals("play")) {
+            this.currentFrame = this.clip.getMicrosecondPosition();
+            clip.stop();
+            status = "paused";
+            System.out.println("⏸️ Paused: " + currentSong.getTitle());
+        } else {
+            System.out.println("⚠️ No audio is currently playing.");
+        }
+    }
+
+    public void resume() {
+        if (status.equals("paused")) {
+            clip.setMicrosecondPosition(currentFrame);
+            clip.start();
+            status = "play";
+            System.out.println("▶️ Resumed: " + currentSong.getTitle());
+        } else {
+            System.out.println("⚠️ Audio is not paused.");
+        }
+    }
+
+    public void stop() {
+        if (clip != null && clip.isRunning()) {
+            clip.stop();
+        }
+        if (clip != null) {
+            clip.close();
+        }
+        status = "stopped";
+    }
+    
+    public String getStatus() {
+        return status;
+    }
+}D

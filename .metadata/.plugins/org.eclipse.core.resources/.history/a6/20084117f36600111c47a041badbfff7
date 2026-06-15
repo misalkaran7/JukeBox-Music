@@ -1,0 +1,116 @@
+package jukebox_cli;
+
+import java.io.*;
+
+public class AudioAnalyzer {
+
+    // === USP 1: AUDIO DNA HASHING & MOOD ENGINE ===
+    public static void analyzeTrackDNA(Song song) {
+        File file = new File(song.getFilePath());
+        if (!file.exists()) return;
+
+        long totalBytes = file.length();
+        double energyAccumulator = 0;
+        int sampleCount = 0;
+
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            long skipped = fis.skip(44); // Skip WAV header
+
+            while ((bytesRead = fis.read(buffer)) != -1) {
+                for (int i = 0; i < bytesRead; i += 2) {
+                    if (i + 1 < bytesRead) {
+                        short sample = (short) ((buffer[i + 1] << 8) | (buffer[i] & 0xff));
+                        energyAccumulator += Math.abs(sample);
+                        sampleCount++;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("⚠️ Parsing error on track: " + song.getTitle());
+        }
+
+        double averageIntensity = sampleCount > 0 ? (energyAccumulator / sampleCount) : 0;
+        int pseudoHash = (int) (totalBytes ^ (long) averageIntensity);
+        String generatedDNA = "FX-" + Integer.toHexString(Math.abs(pseudoHash)).toUpperCase();
+        if (generatedDNA.length() > 9) generatedDNA = generatedDNA.substring(0, 9);
+
+        String calculatedMood = (averageIntensity > 8000) ? "🔥 High-Energy" : 
+                                (averageIntensity > 3000) ? "🎸 Melodic/Moderate" : "☕ Chill/Ambient";
+
+        song.setAnalysisData(generatedDNA, calculatedMood, averageIntensity);
+    }
+
+    // === USP 2: STEGANOGRAPHY VAULT ENGINE ===
+    public static void hideSecretMessage(Song song, String message) {
+        File sourceFile = new File(song.getFilePath());
+        // Append an end marker so the reader knows where to stop decoding
+        message += "##END##"; 
+        byte[] messageBytes = message.getBytes();
+
+        try {
+            byte[] audioBytes = new byte[(int) sourceFile.length()];
+            try (DataInputStream dis = new DataInputStream(new FileInputStream(sourceFile))) {
+                dis.readFully(audioBytes);
+            }
+
+            int audioIndex = 44; // Start right after the WAV header
+            for (byte b : messageBytes) {
+                for (int bit = 0; bit < 8; bit++) {
+                    if (audioIndex >= audioBytes.length) {
+                        System.out.println("❌ Error: Message is too long for this specific audio sample.");
+                        return;
+                    }
+                    int currentBit = (b >> bit) & 1;
+                    // Clear the Least Significant Bit (LSB) and write the secret bit
+                    audioBytes[audioIndex] = (byte) ((audioBytes[audioIndex] & 0xFE) | currentBit);
+                    audioIndex++;
+                }
+            }
+
+            // Overwrite original file safely with hidden contents
+            try (FileOutputStream fos = new FileOutputStream(sourceFile)) {
+                fos.write(audioBytes);
+            }
+            song.setSecureVaultStatus(true);
+            System.out.println("🔒 Success! Secret payload securely encrypted into audio streams.");
+        } catch (IOException e) {
+            System.out.println("❌ Failed to embed payload: " + e.getMessage());
+        }
+    }
+
+    public static String extractSecretMessage(Song song) {
+        File file = new File(song.getFilePath());
+        if (!file.exists()) return "File not found.";
+
+        StringBuilder decodedMessage = new StringBuilder();
+        try (FileInputStream fis = new FileInputStream(file)) {
+            long skipped = fis.skip(44); // Skip WAV header
+            
+            int currentByteVal = 0;
+            int bitCounter = 0;
+            int readByte;
+
+            while ((readByte = fis.read()) != -1) {
+                int lsb = readByte & 1; // Extract the LSB bit
+                currentByteVal |= (lsb << bitCounter);
+                bitCounter++;
+
+                if (bitCounter == 8) {
+                    char decodedChar = (char) currentByteVal;
+                    decodedMessage.append(decodedChar);
+                    
+                    if (decodedMessage.toString().endsWith("##END##")) {
+                        return decodedMessage.substring(0, decodedMessage.length() - 7);
+                    }
+                    currentByteVal = 0;
+                    bitCounter = 0;
+                }
+            }
+        } catch (IOException e) {
+            return "❌ Error parsing audio streams.";
+        }
+        return "⚠️ No hidden secure vault payload signatures recognized.";
+    }
+}

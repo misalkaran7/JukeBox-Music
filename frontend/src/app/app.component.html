@@ -1,0 +1,71 @@
+<div class="workstation-container">
+  <header>
+    <h1>⚡ CYBER-JUKEBOX WEB WORKSTATION</h1>
+    <p>Advanced Audio DNA Profiler & Steganography Security Hub</p>
+  </header>
+
+  <div class="main-layout">
+    <section class="library-panel">
+      <h2>🧬 Decoded System Track Directory</h2>
+      
+      <div class="search-container">
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery" 
+          placeholder="⚡ Filter audio track profiles by title..." 
+          class="cyber-search"
+        />
+      </div>
+
+      <div *ngIf="filteredTracks.length === 0 && trackLibrary.length > 0" class="empty-warn">
+        ⚠️ No tracks match your active search filter parameter sequences.
+      </div>
+      
+      <div *ngIf="trackLibrary.length === 0" class="empty-warn">
+        ⚠️ No tracks found. Ensure JukeboxHttpServer is running on port 8080.
+      </div>
+
+      <div class="track-card" *ngFor="let song of filteredTracks" [class.active]="selectedSong?.id === song.id">
+        <div class="track-details">
+          <h3>{{ song.title }}</h3>
+          <div class="badge-row">
+            <span class="badge dna">DNA: {{ song.dna }}</span>
+            <span class="badge mood">Mood: {{ song.mood }}</span>
+          </div>
+        </div>
+        <button class="btn-play" (click)="playSong(song)">▶ Stream</button>
+      </div>
+    </section>
+
+    <section class="control-panel">
+      <div class="deck-player">
+        <h2>🎵 Live Playing Deck</h2>
+        <p class="now-playing" *ngIf="selectedSong">Streaming: <strong>{{ selectedSong.title }}</strong></p>
+        <p class="now-playing" *ngIf="!selectedSong">No active streaming signal buffer...</p>
+        <audio #audioPlayer hidden></audio>
+        
+        <div class="player-controls">
+          <button (click)="pausePlayback()">⏸ Pause</button>
+          <button (click)="resumePlayback()">▶ Resume</button>
+          <button (click)="stopPlayback()">⏹ Stop</button>
+        </div>
+      </div>
+
+      <div class="vault-box">
+        <h2>🔒 Steganographic Secure Vault</h2>
+        <p class="hint">Inject encrypted plaintext fragments directly into local WAV audio frames.</p>
+        
+        <textarea [(ngModel)]="secretMessage" placeholder="Type secret text string payload here..."></textarea>
+        
+        <button class="btn-vault" (click)="injectMessage()">🔒 Inject Message Payload</button>
+        <hr class="divider">
+        
+        <button class="btn-extract" (click)="extractMessage()">🔓 Decrypt & Extract Message</button>
+        
+        <div class="vault-output" *ngIf="extractedVaultText">
+          <strong>Extracted Text:</strong> <br> {{ extractedVaultText }}
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

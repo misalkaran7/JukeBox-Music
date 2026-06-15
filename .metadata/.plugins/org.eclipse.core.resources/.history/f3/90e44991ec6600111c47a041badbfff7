@@ -1,0 +1,33 @@
+package jukebox_cli;
+
+import java.io.File;
+import java.util.ArrayList;
+
+public class FolderReader {
+
+    public static ArrayList<Song> loadSongsFromFolder(String folderName) {
+        ArrayList<Song> localSongs = new ArrayList<>();
+        String projectPath = System.getProperty("user.dir");
+        File musicFolder = new File(projectPath + File.separator + folderName);
+
+        System.out.println("Searching for music in: " + musicFolder.getAbsolutePath());
+
+        if (musicFolder.exists() && musicFolder.isDirectory()) {
+            File[] files = musicFolder.listFiles();
+
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile() && file.getName().toLowerCase().endsWith(".wav")) {
+                        String title = file.getName().replace(".wav", ""); 
+                        String absolutePath = file.getAbsolutePath();
+                        localSongs.add(new Song(title, absolutePath));
+                    }
+                }
+            }
+        } else {
+            System.out.println("❌ Folder '" + folderName + "' not found at project root!");
+        }
+
+        return localSongs;
+    }
+}

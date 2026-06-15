@@ -1,0 +1,277 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(8, 9, 12, 0.55), rgba(8, 9, 12, 0.72)),
+    url('../assets/cyber-bg.jpg') center center / cover fixed no-repeat;
+}
+
+/* --- Core Terminal Container Setup --- */
+.workstation-container {
+  padding: 30px;
+  max-width: 1300px;
+  margin: 0 auto;
+  font-family: 'Courier New', Courier, monospace; /* Monospace font for terminal theme */
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* --- Header System Branding --- */
+header {
+  text-align: center;
+  border-bottom: 2px dashed #990011; /* Crimson dashed line accent */
+  padding-bottom: 20px;
+  margin-bottom: 35px;
+  text-shadow: 0 0 10px rgba(255, 0, 51, 0.4);
+}
+
+header h1 {
+  color: #ff0033; /* Intense Neon Red */
+  font-size: 32px;
+  letter-spacing: 4px;
+  margin: 0;
+  font-weight: 900;
+}
+
+header p {
+  color: #a3a8b8;
+  margin: 8px 0 0 0;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+/* --- Grid Control Dashboard --- */
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 35px;
+}
+
+/* --- Unified Content Control Panels --- */
+.library-panel, .control-panel {
+  background: rgba(16, 18, 27, 0.85); /* Semitransparent dark slate */
+  border: 1px solid #4a0d14; /* Crimson border trace */
+  border-radius: 4px;
+  padding: 25px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px); /* Blur effect to read text easily over background wires */
+}
+
+h2 {
+  color: #ff0033;
+  font-size: 18px;
+  letter-spacing: 2px;
+  margin-top: 0;
+  border-bottom: 1px solid #4a0d14;
+  padding-bottom: 12px;
+  text-transform: uppercase;
+}
+
+/* --- Media Row Module Elements --- */
+.track-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(26, 29, 43, 0.9);
+  padding: 15px;
+  border-radius: 2px;
+  margin-bottom: 15px;
+  border: 1px solid #2d324d;
+  border-left: 5px solid #575c75;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Active Highlight for the Current Streaming Song */
+.track-card.active {
+  border-left-color: #ff0033;
+  border-color: #7a121d;
+  background: rgba(38, 22, 30, 0.9);
+  box-shadow: 0 0 10px rgba(255, 0, 51, 0.2);
+}
+
+.track-details h3 {
+  margin: 0 0 10px 0;
+  font-size: 15px;
+  color: #e2e5ec;
+}
+
+/* --- Badge & Tag Formatting Metrics --- */
+.badge-row {
+  display: flex;
+  gap: 12px;
+}
+
+.badge {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 2px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* USP 1: DNA Hash Badge styling */
+.badge.dna { 
+  background: #1a1d2b; 
+  color: #ff0033; 
+  border: 1px solid #4a0d14;
+}
+
+/* USP 1: Mood Badge styling */
+.badge.mood { 
+  background: #2b1116; 
+  color: #ff6680; 
+  border: 1px solid #661424;
+}
+
+/* --- Interactive Core Controls (Buttons) --- */
+button {
+  font-family: 'Courier New', Courier, monospace;
+  cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.15s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 10px rgba(255, 0, 51, 0.4);
+}
+
+.btn-play { 
+  background: transparent; 
+  color: #ff0033; 
+  border: 1px solid #ff0033;
+  padding: 8px 14px;
+}
+
+.btn-play:hover {
+  background: #ff0033;
+  color: #08090c;
+}
+
+/* --- Deck Controls System --- */
+.deck-player, .vault-box {
+  background: rgba(22, 25, 38, 0.9);
+  padding: 20px;
+  border-radius: 4px;
+  margin-bottom: 25px;
+  border: 1px solid #2d324d;
+}
+
+.now-playing {
+  color: #e2e5ec;
+  font-size: 13px;
+  background: #0f111a;
+  padding: 10px;
+  border-left: 3px solid #ff0033;
+}
+
+.player-controls {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.player-controls button { 
+  background: #24283b; 
+  color: #a3a8b8;
+  border: 1px solid #3b4261;
+  flex: 1;
+  padding: 10px;
+}
+
+.player-controls button:hover {
+  color: #ff0033;
+  border-color: #ff0033;
+  background: #1c1016;
+}
+
+/* --- USP 2: Steganographic Input Channels --- */
+textarea {
+  width: 100%;
+  height: 80px;
+  background: #08090c;
+  color: #ff0033;
+  border: 1px solid #4a0d14;
+  border-radius: 2px;
+  padding: 10px;
+  box-sizing: border-box;
+  margin: 15px 0;
+  font-family: monospace;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #ff0033;
+  box-shadow: 0 0 8px rgba(255, 0, 51, 0.3);
+}
+
+.btn-vault { 
+  background: #990011; 
+  color: white; 
+  width: 100%; 
+  padding: 12px;
+  border: 1px solid #ff0033;
+}
+
+.btn-extract { 
+  background: transparent; 
+  color: #ff0033; 
+  width: 100%; 
+  padding: 12px;
+  border: 1px solid #ff0033;
+}
+
+.btn-extract:hover {
+  background: rgba(255, 0, 51, 0.1);
+}
+
+.divider { 
+  border: 0; 
+  border-top: 1px dashed #4a0d14; 
+  margin: 20px 0; 
+}
+
+.vault-output {
+  margin-top: 15px;
+  padding: 12px;
+  background: #08090c;
+  border: 1px dashed #ff0033;
+  color: #ff6680;
+}
+
+.hint {
+  color: #787e91;
+  font-size: 12px;
+  margin: 0;
+}
+
+.empty-warn { 
+  color: #ffcc00; 
+  text-align: center; 
+  padding: 20px; 
+  border: 1px dashed #ffcc00;
+  background: rgba(255, 204, 0, 0.05);
+}
+
+/* --- Cyber Search Field Accent --- */
+.search-container {
+  margin-bottom: 20px;
+}
+.cyber-search {
+  width: 100%;
+  padding: 10px 12px;
+  background: #08090c;
+  border: 1px solid #4a0d14;
+  color: #ff0033;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  border-radius: 2px;
+  box-sizing: border-box;
+}
+.cyber-search:focus {
+  outline: none;
+  border-color: #ff0033;
+  box-shadow: 0 0 10px rgba(255, 0, 51, 0.3);
+}
