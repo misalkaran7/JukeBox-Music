@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -17,7 +17,7 @@ interface Song {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
   trackLibrary: Song[] = [];
   selectedSong: Song | null = null;
   secretMessage: string = '';
@@ -31,6 +31,40 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTracks();
+  }
+
+  ngAfterViewInit(): void {
+    // Scroll Kinetics & Staggered Animations
+    const scrollElements = document.querySelectorAll('.scroll-animate');
+    
+    const elementInView = (el: Element, percentageScroll = 100) => {
+        const elementTop = el.getBoundingClientRect().top;
+        return (elementTop <= (window.innerHeight || document.documentElement.clientHeight) * (percentageScroll/100));
+    };
+
+    const displayScrollElement = (element: Element) => {
+        element.classList.add('visible');
+    };
+
+    const handleScrollAnimation = () => {
+        scrollElements.forEach((el, index) => {
+            if (elementInView(el, 90)) {
+                setTimeout(() => displayScrollElement(el), index * 100);
+            }
+        });
+    };
+
+    handleScrollAnimation();
+    
+    let scrollTimeout: any;
+    window.addEventListener('scroll', () => {
+        if (!scrollTimeout) {
+            scrollTimeout = setTimeout(() => {
+                handleScrollAnimation();
+                scrollTimeout = null;
+            }, 50);
+        }
+    });
   }
 
   // Getter method that filters tracks dynamically based on title matches

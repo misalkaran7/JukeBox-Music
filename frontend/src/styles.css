@@ -1,111 +1,86 @@
-body {
-  background-color: #0f111a;
-  color: #e4e7eb;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+:root {
+  --bg-black: #000000;
+  --crimson-dark: #4A0E17;
+  --crimson-main: #8B0000;
+  --crimson-neon: #FF0033;
+  
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  
+  --font-sans: 'Inter', 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+}
+
+* {
   margin: 0;
-}
-.workstation-container {
-  padding: 25px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-header {
-  text-align: center;
-  border-bottom: 2px solid #1f2438;
-  padding-bottom: 15px;
-  margin-bottom: 25px;
-}
-header h1 {
-  color: #00ffcc;
-  letter-spacing: 2px;
-  margin: 0;
-}
-header p {
-  color: #8af3ff;
-  margin: 5px 0 0 0;
-}
-.main-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
-}
-.library-panel, .control-panel {
-  background: #161925;
-  border: 1px solid #252b45;
-  border-radius: 8px;
-  padding: 20px;
-}
-h2 {
-  color: #ff007f;
-  margin-top: 0;
-  border-bottom: 1px solid #252b45;
-  padding-bottom: 10px;
-}
-.track-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #1f2438;
-  padding: 12px 15px;
-  border-radius: 6px;
-  margin-bottom: 12px;
-  border-left: 4px solid #3d446b;
-}
-.track-card.active {
-  border-left-color: #00ffcc;
-  background: #252f4d;
-}
-.track-details h3 {
-  margin: 0 0 8px 0;
-  font-size: 16px;
-}
-.badge-row {
-  display: flex;
-  gap: 10px;
-}
-.badge {
-  font-size: 11px;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-weight: bold;
-}
-.badge.dna { background: #3d446b; color: #00ffcc; }
-.badge.mood { background: #4a2b57; color: #ff007f; }
-button {
-  background: #ff007f;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-}
-button:hover { opacity: 0.9; }
-.btn-play { background: #00ffcc; color: #0f111a; }
-.deck-player, .vault-box {
-  background: #1f2438;
-  padding: 15px;
-  border-radius: 6px;
-  margin-bottom: 20px;
-}
-.player-controls {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
-}
-.player-controls button { background: #3d446b; flex: 1; }
-textarea {
-  width: 100%;
-  height: 70px;
-  background: #0f111a;
-  color: white;
-  border: 1px solid #3d446b;
-  border-radius: 4px;
-  padding: 8px;
+  padding: 0;
   box-sizing: border-box;
-  margin: 10px 0;
 }
-.btn-vault { background: #ff007f; width: 100%; }
-.btn-extract { background: #00ffcc; color: #0f111a; width: 100%; }
-.divider { border: 0; border-top: 1px solid #3d446b; margin: 15px 0; }
-.empty-warn { color: #ffcc00; text-align: center; padding: 20px; }
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--bg-black);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Background Canvas */
+#fluid-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  background: var(--bg-black);
+}
+
+/* Dithered Matrix Texture Overlay */
+.dither-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+  background-size: 4px 4px;
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+}
+
+h1, h2, h3 {
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+/* Glassmorphism Utilities */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Scroll Animations */
+.scroll-animate {
+  opacity: 0;
+  transform: scale(0.95) translateY(20px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-animate.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
