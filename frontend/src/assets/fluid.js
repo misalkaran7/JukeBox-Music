@@ -3,7 +3,7 @@ if (canvas) {
     const ctx = canvas.getContext('2d');
     let width, height;
 
-    // Crimson / Burgundy color palette
+    // Crimson / Burgundy color palette (perfect color)
     const colors = [
         'rgba(74, 14, 23, 0.4)',  // Deep Burgundy
         'rgba(139, 0, 0, 0.3)',   // Crimson Red
@@ -33,27 +33,42 @@ if (canvas) {
     }
 
     class Blob {
-        constructor(color, size, speed, angle, radiusX, radiusY) {
+        constructor(color, size, speed, angle, radiusX, radiusY, index) {
             this.color = color;
             this.size = size;
-            this.speed = speed;
+            this.speed = speed * 0.8; // subtle motion
             this.angle = angle;
             this.baseRadiusX = radiusX;
             this.baseRadiusY = radiusY;
+            this.index = index;
         }
 
         draw(time) {
             const x = width / 2 + Math.cos(this.angle + time * this.speed) * this.baseRadiusX + (mouseX * 0.3);
-            const y = height / 2 + Math.sin(this.angle + time * this.speed) * this.baseRadiusY - scrollY;
+            const y = height / 2 + Math.sin(this.angle + time * this.speed * 0.8) * this.baseRadiusY - scrollY;
 
-            const gradient = ctx.createRadialGradient(x, y, 0, x, y, this.size);
+            ctx.save();
+            ctx.translate(x, y);
+            // Rotate to create a sweeping wave effect
+            ctx.rotate(this.angle + time * this.speed * 0.1);
+            
+            // Stretch out the blobs to make them look like fluid bands
+            if (this.index % 2 === 0) {
+                ctx.scale(2.5, 0.4);
+            } else {
+                ctx.scale(0.4, 2.5);
+            }
+
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.size);
             gradient.addColorStop(0, this.color);
             gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
             ctx.fillStyle = gradient;
             ctx.beginPath();
-            ctx.arc(x, y, this.size, 0, Math.PI * 2);
+            ctx.arc(0, 0, this.size, 0, Math.PI * 2);
             ctx.fill();
+            
+            ctx.restore();
         }
     }
 
@@ -63,10 +78,16 @@ if (canvas) {
         blobs.length = 0;
         const baseSize = Math.max(width, height);
         
-        blobs.push(new Blob(colors[0], baseSize * 0.8, 0.0002, 0, baseSize * 0.2, baseSize * 0.3));
-        blobs.push(new Blob(colors[1], baseSize * 0.9, 0.00015, Math.PI, baseSize * 0.3, baseSize * 0.2));
-        blobs.push(new Blob(colors[2], baseSize * 0.6, 0.0003, Math.PI/2, baseSize * 0.15, baseSize * 0.4));
-        blobs.push(new Blob(colors[3], baseSize * 1.2, 0.0001, Math.PI/4, baseSize * 0.4, baseSize * 0.1));
+        // Add more blobs to create a complex marbling/wavy pattern
+        for(let i=0; i<8; i++) {
+            const color = colors[i % colors.length];
+            const size = baseSize * (0.6 + Math.random() * 0.6);
+            const speed = 0.0001 + Math.random() * 0.0001;
+            const angle = Math.random() * Math.PI * 2;
+            const rx = baseSize * (0.1 + Math.random() * 0.3);
+            const ry = baseSize * (0.1 + Math.random() * 0.3);
+            blobs.push(new Blob(color, size, speed, angle, rx, ry, i));
+        }
     }
 
     let startTime = Date.now();
