@@ -22,12 +22,11 @@ export class AppComponent implements OnInit, AfterViewInit {
   selectedSong: Song | null = null;
   secretMessage: string = '';
   extractedVaultText: string = '';
-  searchQuery: string = ''; 
+  searchQuery: string = '';
 
   // Fixed and explicitly targeted to your active Java Server port discovered in the terminal
-  private backendUrl = 'http://localhost:8091/api';
-
-  constructor(private http: HttpClient) {}
+  private backendUrl = 'https://jukebox-backend-nbs9.onrender.com/api';
+  constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
     this.loadTracks();
@@ -36,34 +35,34 @@ export class AppComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     // Scroll Kinetics & Staggered Animations
     const scrollElements = document.querySelectorAll('.scroll-animate');
-    
+
     const elementInView = (el: Element, percentageScroll = 100) => {
-        const elementTop = el.getBoundingClientRect().top;
-        return (elementTop <= (window.innerHeight || document.documentElement.clientHeight) * (percentageScroll/100));
+      const elementTop = el.getBoundingClientRect().top;
+      return (elementTop <= (window.innerHeight || document.documentElement.clientHeight) * (percentageScroll / 100));
     };
 
     const displayScrollElement = (element: Element) => {
-        element.classList.add('visible');
+      element.classList.add('visible');
     };
 
     const handleScrollAnimation = () => {
-        scrollElements.forEach((el, index) => {
-            if (elementInView(el, 90)) {
-                setTimeout(() => displayScrollElement(el), index * 100);
-            }
-        });
+      scrollElements.forEach((el, index) => {
+        if (elementInView(el, 90)) {
+          setTimeout(() => displayScrollElement(el), index * 100);
+        }
+      });
     };
 
     handleScrollAnimation();
-    
+
     let scrollTimeout: any;
     window.addEventListener('scroll', () => {
-        if (!scrollTimeout) {
-            scrollTimeout = setTimeout(() => {
-                handleScrollAnimation();
-                scrollTimeout = null;
-            }, 50);
-        }
+      if (!scrollTimeout) {
+        scrollTimeout = setTimeout(() => {
+          handleScrollAnimation();
+          scrollTimeout = null;
+        }, 50);
+      }
     });
   }
 
@@ -128,7 +127,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       .subscribe({
         next: () => {
           alert(`🔒 Secret payload safely injected into: ${this.selectedSong?.title}`);
-          this.secretMessage = ''; 
+          this.secretMessage = '';
         },
         error: (err) => console.error('Injection link bottleneck:', err)
       });
@@ -144,7 +143,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.http.get(`${this.backendUrl}/stegano/extract?id=${this.selectedSong.id}`, { responseType: 'text' })
       .subscribe({
         next: (data) => {
-          this.extractedVaultText = data; 
+          this.extractedVaultText = data;
         },
         error: (err) => console.error('Extraction link bottleneck:', err)
       });
